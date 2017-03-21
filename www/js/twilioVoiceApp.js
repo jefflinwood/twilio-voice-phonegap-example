@@ -30,19 +30,18 @@ function onDeviceReady() {
 
         $('#statusMessage').text('Ready to start call');
 
-        // Accept or reject a call - only needed if not using CallKit
-        /*
-                Twilio.TwilioVoiceClient.callinvitereceived(function (call) {
-            var confirmed = confirm('Accept incoming call from ' + call.from + '?');
-            if (confirmed) {
-                Twilio.TwilioVoiceClient.acceptCallInvite();
-            } else {
-                Twilio.TwilioVoiceClient.rejectCallInvite();
-            }
-        });
-        */
-
-
+        // Accept or reject a call - only needed on Android - iOS uses CallKit
+        if (device.platform == 'Android') {
+            Twilio.TwilioVoiceClient.callinvitereceived(function (call) {
+                var confirmed = confirm('Accept incoming call from ' + call.from + '?');
+                if (confirmed) {
+                    Twilio.TwilioVoiceClient.acceptCallInvite();
+                } else {
+                    Twilio.TwilioVoiceClient.rejectCallInvite();
+                }
+            });
+        }
+        
         // Handle Errors
         Twilio.TwilioVoiceClient.error(function (error) {
             $('#statusMessage').text(error);
