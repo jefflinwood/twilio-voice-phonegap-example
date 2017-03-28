@@ -1,6 +1,8 @@
 // refresh token if needed
 var token;
 
+var speakerEnabled = false;
+
 function initializeUI() {
   
   $("#dialButton").click(function() {
@@ -10,6 +12,27 @@ function initializeUI() {
   
   $("#hangupButton").click(function() {
     Twilio.TwilioVoiceClient.disconnect();
+  });
+
+  $("#speakerButton").click(function() {
+      speakerEnabled = !speakerEnabled;
+      if (speakerEnabled) {
+        Twilio.TwilioVoiceClient.setSpeaker("on");
+      } else {
+        Twilio.TwilioVoiceClient.setSpeaker("off");
+      }
+  });
+
+  $("#muteButton").click(function() {
+      $("#muteButton").toggle();
+      $("#unmuteButton").toggle();
+      Twilio.TwilioVoiceClient.muteCall();
+  });
+
+  $("#unmuteButton").click(function() {
+      $("#muteButton").toggle();
+      $("#unmuteButton").toggle();
+      Twilio.TwilioVoiceClient.unmuteCall();
   });
 }
 
@@ -26,9 +49,11 @@ function onDeviceReady() {
     var tokenRequest    = new XMLHttpRequest();
     tokenRequest.onload = function() {
         token = tokenRequest.responseText;
-        Twilio.TwilioVoiceClient.initialize(token);
+        Twilio.TwilioVoiceClient.clientinitialized(function() {
+             $('#statusMessage').text('Ready to start call');
+        });
 
-        $('#statusMessage').text('Ready to start call');
+        Twilio.TwilioVoiceClient.initialize(token);
 
         // Accept or reject a call - only needed on Android - iOS uses CallKit
         if (device.platform == 'Android') {
